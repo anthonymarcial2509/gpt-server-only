@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Usa el endpoint de NGROK (actualiza cada vez que se reinicie)
-const VENOM_ENDPOINT = process.env.VENOM_ENDPOINT || https://XXXX.ngrok-free.app/preguntar PORT=3000;
+const VENOM_ENDPOINT = process.env.VENOM_ENDPOINT || https://12db-38-56-219-210.ngrok-free.app/preguntar;
 
 app.use(bodyParser.json());
 
