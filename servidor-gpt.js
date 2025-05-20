@@ -1,12 +1,12 @@
-// servidor-gpt.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
-require('dotenv').config();
+const fetch = require('node-fetch'); // asegúrate que esté instalado
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const VENOM_ENDPOINT = process.env.VENOM_ENDPOINT;
+
+// Usa el endpoint de NGROK (actualiza cada vez que se reinicie)
+const VENOM_ENDPOINT = process.env.VENOM_ENDPOINT || https://XXXX.ngrok-free.app/preguntar PORT=3000;
 
 app.use(bodyParser.json());
 
@@ -28,18 +28,15 @@ app.post('/preguntar', async (req, res) => {
       body: JSON.stringify({ pregunta })
     });
 
-    if (!respuesta.ok) {
-      throw new Error(`Error al contactar con Venom: ${respuesta.status}`);
-    }
+    const data = await respuesta.json();
+    res.json(data);
 
-    const datos = await respuesta.json();
-    res.json({ respuesta: datos.respuesta || datos });
   } catch (error) {
-    console.error('Error en /preguntar:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error al contactar con Venom:', error);
+    res.status(500).json({ error: 'Error al contactar con Venom' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor GPT escuchando en el puerto ${PORT}`);
+  console.log(`Servidor GPT en puerto ${PORT}`);
 });
