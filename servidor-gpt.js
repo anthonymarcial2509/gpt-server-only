@@ -10,13 +10,15 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 // Reemplaza esta URL con tu endpoint local o de ngrok
-const VENOM_ENDPOINT = 'http://localhost:3001/preguntar';
+const VENOM_ENDPOINT = 'https://2121-38-56-219-210.ngrok-free.app/preguntar';
 
 app.get('/', (req, res) => {
   res.send('Servidor GPT está activo');
 });
 
 app.post('/preguntar', async (req, res) => {
+  // Lógica aquí
+});
   const { pregunta } = req.body;
 
   if (!pregunta) {
