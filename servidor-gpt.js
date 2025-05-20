@@ -1,7 +1,6 @@
-// servidor-gpt.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios');
+const fetch = require('node-fetch'); // Asegúrate de tener instalado node-fetch v2
 require('dotenv').config();
 
 const app = express();
@@ -9,27 +8,39 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.post('/preguntar', async (req, res) => {
-  const pregunta = req.body.pregunta;
+app.get('/', (req, res) => {
+  res.send('✅ Servidor GPT está activo');
+});
 
+app.post('/preguntar', async (req, res) => {
+  const { pregunta } = req.body;
   if (!pregunta) {
     return res.status(400).json({ error: 'Falta el campo pregunta' });
   }
 
   try {
-    // Enviar la pregunta al bot Venom que corre localmente
-    const respuestaBot = await axios.post('http://localhost:3001/mensaje', {
-      mensaje: pregunta
+    const respuestaGPT = await fetch(`${process.env.GPT_CHAT_URL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': `__Secure-next-auth.session-token=${process.env.GPT_SESSION_TOKEN}`
+      },
+      body: JSON.stringify({ mensaje: pregunta })
     });
 
-    // Confirmar que el bot lo procesó correctamente
-    return res.json({ respuesta: respuestaBot.data.respuesta });
+    const datos = await respuestaGPT.json();
+    if (!datos || !datos.respuesta) {
+      return res.status(500).json({ error: 'Respuesta vacía desde GPT' });
+    }
+
+    res.json({ respuesta: datos.respuesta });
+
   } catch (error) {
-    console.error('Error al reenviar al bot local:', error.message);
-    return res.status(500).json({ error: 'Error al contactar al bot Venom local' });
+    console.error('❌ Error consultando GPT:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`🔌 Servidor GPT corriendo en puerto ${PORT}`);
+  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });
