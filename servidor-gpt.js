@@ -1,19 +1,19 @@
-// servidor-gpt.js en Render
+// servidor-gpt.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
 const fetch = require('node-fetch');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const LOCAL_BOT_URL = 'http://localhost:3001/preguntar'; // Cambia esto si usas ngrok
 
 app.use(bodyParser.json());
-app.use(cors());
+
+// Reemplaza esta URL con tu endpoint local o de ngrok
+const VENOM_ENDPOINT = 'http://localhost:3001/preguntar';
 
 app.get('/', (req, res) => {
-  res.send('Servidor GPT Render activo.');
+  res.send('Servidor GPT está activo');
 });
 
 app.post('/preguntar', async (req, res) => {
@@ -24,20 +24,21 @@ app.post('/preguntar', async (req, res) => {
   }
 
   try {
-    const respuesta = await fetch(LOCAL_BOT_URL, {
+    const respuesta = await fetch(VENOM_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pregunta })
     });
 
-    const data = await respuesta.json();
-    res.json(data);
+    const datos = await respuesta.json();
+    res.json(datos);
+
   } catch (error) {
-    console.error('Error reenviando a local:', error);
-    res.status(500).json({ error: 'Error reenviando a bot local' });
+    console.error('Error consultando GPT:', error.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor en Render corriendo en puerto ${PORT}`);
+  console.log(`Servidor intermediario escuchando en http://localhost:${PORT}`);
 });
